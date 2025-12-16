@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -18,13 +16,18 @@ public class ProductService {
     @Autowired
     private ProductRespository productRepository;
 
+    public Product createProduct(Product product){
+        return productRepository.save(product);
+    }
 
     public List<Product> listAll() {
         return productRepository.findAll();
     }
 
-    public Optional<Product> findById(Long id) {
-        return productRepository.findById(id);
+    public Product findById(Long id) {
+
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Producto no encontrado"));
     }
 
     public String removeById(Long id) {
@@ -40,7 +43,7 @@ public class ProductService {
     public Product patchProducto(Long id, Map<String, Object> fields) {
 
         Product producto = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new ProductNotFoundException("Producto no encontrado"));
 
         fields.forEach((key, value) -> {
             switch (key) {

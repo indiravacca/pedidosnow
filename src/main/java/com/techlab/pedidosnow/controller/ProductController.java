@@ -15,19 +15,16 @@ import java.util.Optional;
 public class ProductController {
 
     @Autowired
-    private ProductRespository productRepository;
-
-    @Autowired
     private ProductService productService;
 
     @GetMapping("/{id}")
-    public Optional<Product> getProductById(@PathVariable Long id){
+    public Product getProductById(@PathVariable Long id){
         return productService.findById(id);
     }
 
     @PostMapping
-    public Product creatProduct(@RequestBody Product product){
-        return productRepository.save(product);
+    public Product createProduct(@RequestBody Product product){
+        return productService.createProduct(product);
     }
 
     @GetMapping
