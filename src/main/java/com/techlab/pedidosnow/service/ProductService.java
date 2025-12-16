@@ -2,29 +2,66 @@ package com.techlab.pedidosnow.service;
 
 import com.techlab.pedidosnow.exceptions.ProductNotFoundException;
 import com.techlab.pedidosnow.model.Product;
+import com.techlab.pedidosnow.persistence.ProductRespository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+@Service
 public class ProductService {
-    private final List<Product> products = new ArrayList<>();
-    private int nextId = 1;
 
-    public ProductService() {
-    }
+    @Autowired
+    private ProductRespository productRepository;
+
 
     public List<Product> listAll() {
-        return List.copyOf(products);
+        return productRepository.findAll();
     }
 
-    public Product findById(int id) throws ProductNotFoundException {
-        Optional<Product> op = products.stream().filter(p -> p.getId() == id).findFirst();
-        return op.orElseThrow(() -> new ProductNotFoundException("Producto con id " + id + " no encontrado"));
+    public Optional<Product> findById(Long id) {
+        return productRepository.findById(id);
     }
 
-    public void removeById(int id) throws ProductNotFoundException {
-        Product p = findById(id);
-        products.remove(p);
+    public String removeById(Long id) {
+        if (productRepository.existsById(id)){
+            productRepository.deleteById(id);
+            return "Se elimino el producto";
+        }else{
+            return "Producto no encontrado: "+id;
+        }
+    }
+
+    @Transactional
+    public Product patchProducto(Long id, Map<String, Object> fields) {
+
+        Product producto = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        fields.forEach((key, value) -> {
+            switch (key) {
+                case "name":
+                    producto.setName((String) value);
+                    break;
+                case "price":
+                    producto.setPrice(Double.valueOf(value.toString()));
+                    break;
+                case "stock":
+                    producto.setStock(Integer.valueOf(value.toString()));
+                    break;
+                case "description":
+                    producto.setDescription((String) value);
+                    break;
+                case "imageUrl":
+                    producto.setImageUrl((String) value);
+                    break;
+            }
+        });
+
+        return productRepository.save(producto);
     }
 }

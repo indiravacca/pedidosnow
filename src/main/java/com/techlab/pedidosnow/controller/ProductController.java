@@ -2,10 +2,12 @@ package com.techlab.pedidosnow.controller;
 
 import com.techlab.pedidosnow.model.Product;
 import com.techlab.pedidosnow.persistence.ProductRespository;
+import com.techlab.pedidosnow.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -15,9 +17,12 @@ public class ProductController {
     @Autowired
     private ProductRespository productRepository;
 
+    @Autowired
+    private ProductService productService;
+
     @GetMapping("/{id}")
     public Optional<Product> getProductById(@PathVariable Long id){
-        return productRepository.findById(id);
+        return productService.findById(id);
     }
 
     @PostMapping
@@ -27,16 +32,16 @@ public class ProductController {
 
     @GetMapping
     public List<Product> getProduct(){
-        return productRepository.findAll();
+        return productService.listAll();
     }
 
     @DeleteMapping()
-    public String deleteProduct(@RequestParam Long id){
-        if (productRepository.existsById(id)){
-            productRepository.deleteById(id);
-            return "Se elimino el producto";
-        }else{
-            return "Producto no encontrado: "+id;
-        }
+    public String deleteProduct(@RequestParam Long id) {
+       return productService.removeById(id);
+    }
+
+    @PatchMapping("/{id}")
+    public Product patchProduct(@PathVariable Long id, @RequestBody Map<String, Object> fields){
+        return productService.patchProducto(id, fields);
     }
 }
