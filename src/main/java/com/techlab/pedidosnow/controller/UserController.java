@@ -24,7 +24,6 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    //test
     @GetMapping("/test")
     public String test(){
         return "Esto funciona";
@@ -53,7 +52,6 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    //to delete the user by a given id.
     @DeleteMapping()
     public String deleteUser(@RequestParam Long id){
         if (userRepository.existsById(id)){
