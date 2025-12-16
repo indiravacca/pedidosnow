@@ -23,4 +23,14 @@ public class ProductController {
     public List<Product> getUsers(){
         return productRepository.findAll();
     }
+
+    @DeleteMapping()
+    public String deleteUser(@RequestParam Long id){
+        if (productRepository.existsById(id)){
+            productRepository.deleteById(id);
+            return "Se elimino el producto";
+        }else{
+            return "Producto no encontrado: "+id;
+        }
+    }
 }
